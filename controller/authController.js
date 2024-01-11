@@ -92,7 +92,7 @@ const authController = {
             .status(StatusCodes.UNAUTHORIZED)
             .json({ msg: `passwords not matched` });
         let authToken = createAccessToken({ id: extMobile._id });
-        //set the token in cookies
+        //set the token in cookies user
 
         res.cookie("loginToken", authToken, {
           httpOnly: true,
@@ -191,7 +191,7 @@ const authController = {
       let id = req.userId;
       let { password } = req.body;
 
-      let extUser = await User.findById({ id: id });
+      let extUser = await User.findById({ _id: id });
 
       if (!extUser)
         return res
