@@ -10,7 +10,7 @@ const mailConfig = require(`../utility/mailconfig`);
 const authController = {
   register: async (req, res) => {
     try {
-      const { name, email, mobile, password } = req.body;
+      const { name, email, mobile, role, password } = req.body;
 
       //email
       const extEmail = await User.findOne({ email });
@@ -20,12 +20,12 @@ const authController = {
       if (extEmail)
         return res
           .status(StatusCodes.CONFLICT)
-          .json({ msg: `${email} already exsists` });
+          .json({ msg: `${email} already exsists`,success:false });
 
       if (extMobile)
         return res
           .status(StatusCodes.CONFLICT)
-          .json({ msg: `${mobile} already exsists` });
+          .json({ msg: `${mobile} already exsists` ,success:false});
 
       const encPass = await bcrypt.hash(password, 10); //encrypts the password into hash
 
@@ -33,16 +33,17 @@ const authController = {
         name,
         email,
         mobile,
+        role,
         password: encPass,
       });
 
       res
         .status(StatusCodes.ACCEPTED)
-        .json({ msg: "New user registered succesfully", user: data });
+        .json({ msg: "New user registered succesfully", user: data ,success:true});
     } catch (err) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ msg: err.message });
+        .json({ msg: err.message,success:false });
     }
   },
 
@@ -56,16 +57,16 @@ const authController = {
         if (!extEmail)
           return res
             .status(StatusCodes.CONFLICT)
-            .json({ msg: `${email} is not registered` });
+            .json({ msg: `${email} is not registered`,success:false  });
 
         //comparing the password(string,hash)
         let isMatch = await comparePassword(password, extEmail.password);
         if (!isMatch)
           return res
             .status(StatusCodes.UNAUTHORIZED)
-            .json({ msg: `password not matched` });
+            .json({ msg: `password not matched`,success:false  });
         let authToken = createAccessToken({ id: extEmail._id });
-        //set the token in cookies
+        //set the token in cookies one
 
         res.cookie("loginToken", authToken, {
           httpOnly: true,
@@ -75,7 +76,7 @@ const authController = {
         });
         res
           .status(StatusCodes.OK)
-          .json({ msg: `login success(with email)`, authToken });
+          .json({ msg: `login success(with email)`, success:true ,authToken });
       }
       //if login through mobile
       if (mobile) {
@@ -83,14 +84,14 @@ const authController = {
         if (!extMobile)
           return res
             .status(StatusCodes.CONFLICT)
-            .json({ msg: `${mobile} number doesnt exsist` });
+            .json({ msg: `${mobile} number doesnt exsist`,success:false  });
 
         //compare the password
         let isMatch = await comparePassword(password, extMobile.password);
         if (!isMatch)
           return res
             .status(StatusCodes.UNAUTHORIZED)
-            .json({ msg: `passwords not matched` });
+            .json({ msg: `passwords not matched`,success:false  });
         let authToken = createAccessToken({ id: extMobile._id });
         //set the token in cookies user
 
@@ -103,12 +104,12 @@ const authController = {
 
         res
           .status(StatusCodes.OK)
-          .json({ msg: `login success(with mobile)`, authToken });
+          .json({ msg: `login success(with mobile)`,success:true , authToken });
       }
     } catch (err) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ msg: err.message });
+        .json({ msg: err.message ,success:false });
     }
   },
 
@@ -118,11 +119,11 @@ const authController = {
 
       res.clearCookie("loginToken", { path: `/api/auth/token` });
 
-      res.status(StatusCodes.OK).json({ msg: `logout succesfull` });
+      res.status(StatusCodes.OK).json({ msg: `logout succesfull`,success:true  });
     } catch (err) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ msg: err.message });
+        .json({ msg: err.message ,success:false });
     }
   },
 
@@ -134,7 +135,7 @@ const authController = {
       if (!rToken)
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `token not available` });
+          .json({ msg: `token not available`,success:false  });
 
       //validate user id or not
 
@@ -142,15 +143,15 @@ const authController = {
         if (err)
           return res
             .status(StatusCodes.UNAUTHORIZED)
-            .json({ msg: `Unauthorized login` });
+            .json({ msg: `Unauthorized login`,success:false  });
 
         //if valid
-        res.status(StatusCodes.OK).json({ authToken: rToken });
+        res.status(StatusCodes.OK).json({ authToken: rToken ,success:true  });
       });
     } catch (err) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ msg: err.message });
+        .json({ msg: err.message ,success:false });
     }
   },
 
@@ -160,13 +161,13 @@ const authController = {
       if (!single)
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `user info not found` });
-      res.status(StatusCodes.ACCEPTED).json({ user: single });
+          .json({ msg: `user info not found` ,success:false });
+      res.status(StatusCodes.ACCEPTED).json({ user: single,success:true  });
       // res.json({ user: single });
     } catch (err) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ msg: err.message });
+        .json({ msg: err.message ,success:false });
     }
   },
   verifyUser: async (req, res) => {
@@ -177,12 +178,12 @@ const authController = {
       if (!extEmail)
         return res
           .status(StatusCodes.CONFLICT)
-          .json({ msg: `${email} doesn't exists`, status: false });
+          .json({ msg: `${email} doesn't exists`, success:false  });
       res
         .status(StatusCodes.ACCEPTED)
-        .json({ msg: `email id verified succesfully`, status: true });
+        .json({ msg: `email id verified succesfully`, success:true  });
     } catch (err) {
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err });
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err ,success:false });
     }
   },
 
@@ -196,7 +197,7 @@ const authController = {
       if (!extUser)
         return res
           .status(StatusCodes.CONFLICT)
-          .json({ msg: "Requested user info not exsists" });
+          .json({ msg: "Requested user info not exsists",success:false  });
 
       //encrypt the password
 
@@ -207,9 +208,9 @@ const authController = {
 
       return res
         .status(StatusCodes.ACCEPTED)
-        .json({ msg: `password succesfully updated` });
+        .json({ msg: `password succesfully updated`,success:true  });
     } catch (err) {
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err });
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err ,success:false });
     }
   },
   passwordLink: async (req, res) => {
@@ -220,7 +221,7 @@ const authController = {
       if (!extEmail)
         return res
           .status(StatusCodes.CONFLICT)
-          .json({ msg: `${email} doesn't exists`, status: false });
+          .json({ msg: `${email} doesn't exists`, success:false  });
 
       //password token
 
@@ -236,9 +237,9 @@ const authController = {
       let emailRes = await mailConfig(email, subject, passTemplate);
       res
         .status(StatusCodes.ACCEPTED)
-        .json({ msg: `password link succesfully sent`, status: emailRes });
+        .json({ msg: `password link succesfully sent`, status: emailRes ,success:true });
     } catch (err) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err });
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err ,success:false });
     }
   },
 };

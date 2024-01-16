@@ -8,7 +8,7 @@ const auth = async (req, res, next) => {
   try {
     let token = req.header("Authorization");
     if (!token)
-      return res.status(StatusCodes.NOT_FOUND).json({ msg: `token not found` });
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: `token not found`,success:false  });
 
     //verifiying token
 
@@ -16,7 +16,7 @@ const auth = async (req, res, next) => {
       if (err)
         return res
           .status(StatusCodes.UNAUTHORIZED)
-          .json({ msg: `unauthorized token ` });
+          .json({ msg: `unauthorized token `,success:false  });
 
       // res.json({data})
       req.userId = data.id;
@@ -24,7 +24,7 @@ const auth = async (req, res, next) => {
       next();
     });
   } catch (err) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err });
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err,success:false  });
   }
 };
 

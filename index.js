@@ -29,11 +29,12 @@ app.use(expressFileUpload({
 //api route
 app.use('/api/auth',require('./route/authRoute'))
 app.use('/api/file',require('./route/fileRoute'))
+app.use('/api/user',require('./route/userRoute'))
 
 //default path
 
 app.use('**',(req,res)=>{
-  res.status(StatusCodes.SERVICE_UNAVAILABLE).json({msg:`Requested service path not found`})
+  res.status(StatusCodes.SERVICE_UNAVAILABLE).json({msg:`Requested service path not found`,success:false })
 })
 
 
