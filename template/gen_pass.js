@@ -6,7 +6,7 @@ const reset_password = (name, email, token) => {
                 <p>Follow this link to reset your password</p>
                 <p>
                   <strong>
-                    <a class="btn" target="_blank" href="http://localhost:3000/password/reset?token=${token}">Reset your password</a>
+                    <a class="btn" target="_blank" href="${process.env.URL}/password/reset?token=${token}">Reset your password</a>
                   </strong>
                 </p>
 
@@ -19,3 +19,5 @@ const reset_password = (name, email, token) => {
           </div>`;
 };
 module.exports = reset_password;
+
+

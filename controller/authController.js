@@ -225,7 +225,7 @@ const authController = {
 
       //password token
 
-      let passToken = await createAccessToken({ id: extEmail._id });
+      let passToken = createAccessToken({ id: extEmail._id });
 
       //password reseet template
 
