@@ -3,10 +3,10 @@ const reset_password = (name, email, token) => {
             <main>
               <div>
                 <h1>Hello, ${name}, your email id ${email}</h1>
-                <p>Follow this link to reset your password</p>
+                <p>Follow this token to reset your password</p>
                 <p>
                   <strong>
-                    <a class="btn" target="_blank" href="${process.env.URL}/password/reset?token=${token}">Reset your password</a>
+                    ${token}
                   </strong>
                 </p>
 
