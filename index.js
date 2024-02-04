@@ -8,7 +8,7 @@ const connectDb = require("./db/connect");
 const path = require("path");
 
 const expressFileUpload = require("express-fileupload");
-//instance
+//instance route
 
 const app = express();
 

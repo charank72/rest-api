@@ -8,7 +8,7 @@ const {
   deleteUser,
 } = require("../controller/userController");
 
-userRoute.get("/all",auth,adminRole ,readAll).get("/single/:id",adminRole , readSingle);
+userRoute.get("/all",auth ,readAll).get("/single/:id",adminRole , readSingle);
 
 userRoute.patch("/update/:id",adminRole , updateUser);
 
