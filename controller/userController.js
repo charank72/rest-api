@@ -48,17 +48,14 @@ const updateUser=async (req,res)=>{
 }
 const deleteUser=async (req,res)=>{
   try{
-    let id=req.params.id
-    let single =await User.findById(id)
-      if(!single)
-        return res.status(StatusCodes.CONFLICT).json({msg:`requested email not found`,success:false})
+    let id  = req.params.id 
+    let single = await User.findById(id)
+        if(!single)
+            return res.status(StatusCodes.CONFLICT).json({ msg: `requested email id not found`, success: false})
 
-      if(single.role === "admin")
-        return res.status(StatusCodes.FORBIDDEN).json({msg:`un authorized update entry ...denied,`,success:false})
-    
-      await User.findByIdAndDelete({_id:id})
+        await User.findByIdAndDelete({_id: id })
 
-    res.status(StatusCodes.OK).json({msg:`user info deleted succesfully`,success:true})
+    res.status(StatusCodes.OK).json({ msg: 'user info successfully deleted', success: true })
 
   }catch(err){
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({msg:err.message,success:false})
